@@ -152,6 +152,10 @@ public class LauncherUnfoldAnimationController {
                 mQsbInsettable.setHorizontalInsets(insetPercentage);
             }
         }
+
+        @Override
+        public void onTransitionFinishing() {
+        }
     }
 
     private class LauncherScaleAnimationListener implements TransitionProgressListener {
@@ -176,6 +180,10 @@ public class LauncherUnfoldAnimationController {
         private void setScale(float value) {
             WORKSPACE_SCALE_PROPERTY.setValue(mLauncher.getWorkspace(), value);
             HOTSEAT_SCALE_PROPERTY.setValue(mLauncher.getHotseat(), value);
+        }
+
+        @Override
+        public void onTransitionFinishing() {
         }
     }
 }

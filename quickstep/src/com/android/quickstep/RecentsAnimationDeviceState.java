@@ -76,6 +76,8 @@ import com.android.systemui.shared.system.SystemGestureExclusionListenerCompat;
 import com.android.systemui.shared.system.TaskStackChangeListener;
 import com.android.systemui.shared.system.TaskStackChangeListeners;
 
+import org.lineage.TrebuchetApp;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
@@ -178,8 +180,8 @@ public class RecentsAnimationDeviceState implements DisplayInfoChangeListener {
             SettingsCache.OnChangeListener onChangeListener =
                     enabled -> mIsOneHandedModeEnabled = enabled;
             settingsCache.register(oneHandedUri, onChangeListener);
-            mIsOneHandedModeEnabled = settingsCache.getValue(oneHandedUri);
-            runOnDestroy(() -> settingsCache.unregister(oneHandedUri, onChangeListener));
+            mIsOneHandedModeEnabled = TrebuchetApp.isRecentsEnabled () && settingsCache.getValue(oneHandedUri);
+//            runOnDestroy(() -> settingsCache.unregister(oneHandedUri, onChangeListener));
         } else {
             mIsOneHandedModeEnabled = false;
         }
@@ -189,11 +191,11 @@ public class RecentsAnimationDeviceState implements DisplayInfoChangeListener {
         SettingsCache.OnChangeListener onChangeListener =
                 enabled -> mIsSwipeToNotificationEnabled = enabled;
         settingsCache.register(swipeBottomNotificationUri, onChangeListener);
-        mIsSwipeToNotificationEnabled = settingsCache.getValue(swipeBottomNotificationUri);
+        mIsSwipeToNotificationEnabled = TrebuchetApp.isRecentsEnabled () && settingsCache.getValue(swipeBottomNotificationUri);
         runOnDestroy(() -> settingsCache.unregister(swipeBottomNotificationUri, onChangeListener));
 
         Uri setupCompleteUri = Settings.Secure.getUriFor(Settings.Secure.USER_SETUP_COMPLETE);
-        mIsUserSetupComplete = settingsCache.getValue(setupCompleteUri, 0);
+        mIsUserSetupComplete = TrebuchetApp.isRecentsEnabled () && settingsCache.getValue(setupCompleteUri, 0);
         if (!mIsUserSetupComplete) {
             SettingsCache.OnChangeListener userSetupChangeListener = e -> mIsUserSetupComplete = e;
             settingsCache.register(setupCompleteUri, userSetupChangeListener);
@@ -201,7 +203,7 @@ public class RecentsAnimationDeviceState implements DisplayInfoChangeListener {
         }
 
         try {
-            mPipIsActive = ActivityTaskManager.getService().getRootTaskInfo(
+            mPipIsActive = TrebuchetApp.isRecentsEnabled () && ActivityTaskManager.getService().getRootTaskInfo(
                     WINDOWING_MODE_PINNED, ACTIVITY_TYPE_UNDEFINED) != null;
         } catch (RemoteException e) {
             // Do nothing

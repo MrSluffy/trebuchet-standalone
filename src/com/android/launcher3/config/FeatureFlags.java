@@ -26,6 +26,8 @@ import androidx.annotation.VisibleForTesting;
 import com.android.launcher3.BuildConfig;
 import com.android.launcher3.Utilities;
 
+import org.lineage.TrebuchetApp;
+
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
@@ -46,7 +48,7 @@ public final class FeatureFlags {
     private FeatureFlags() { }
 
     public static boolean showFlagTogglerUi(Context context) {
-        return BuildConfig.IS_DEBUG_DEVICE && Utilities.isDevelopersOptionsEnabled(context);
+        return Utilities.isDevelopersOptionsEnabled(context);
     }
 
     /**
@@ -54,7 +56,7 @@ public final class FeatureFlags {
      * @deprecated Use {@link BuildConfig#IS_STUDIO_BUILD} directly
      */
     @Deprecated
-    public static final boolean IS_STUDIO_BUILD = BuildConfig.IS_STUDIO_BUILD;
+    public static final boolean IS_STUDIO_BUILD = false;
 
     /**
      * Enable moving the QSB on the 0th screen of the workspace. This is not a configuration feature
@@ -62,7 +64,7 @@ public final class FeatureFlags {
      * @deprecated Use {@link BuildConfig#QSB_ON_FIRST_SCREEN} directly
      */
     @Deprecated
-    public static final boolean QSB_ON_FIRST_SCREEN = BuildConfig.QSB_ON_FIRST_SCREEN;
+    public static final boolean QSB_ON_FIRST_SCREEN = false;
 
     /**
      * Feature flag to handle define config changes dynamically instead of killing the process.
@@ -88,10 +90,10 @@ public final class FeatureFlags {
             "PROMISE_APPS_IN_ALL_APPS", false, "Add promise icon in all-apps");
 
     public static final BooleanFlag KEYGUARD_ANIMATION = getDebugFlag(270390904,
-            "KEYGUARD_ANIMATION", false, "Enable animation for keyguard going away on wallpaper");
+            "KEYGUARD_ANIMATION", TrebuchetApp.isRecentsEnabled (), "Enable animation for keyguard going away on wallpaper");
 
     public static final BooleanFlag ENABLE_DEVICE_SEARCH = getReleaseFlag(270390907,
-            "ENABLE_DEVICE_SEARCH", true, "Allows on device search in all apps");
+            "ENABLE_DEVICE_SEARCH", TrebuchetApp.isRecentsEnabled() , "Allows on device search in all apps");
 
     public static final BooleanFlag ENABLE_FLOATING_SEARCH_BAR =
             getDebugFlag(270390286, "ENABLE_FLOATING_SEARCH_BAR", false,

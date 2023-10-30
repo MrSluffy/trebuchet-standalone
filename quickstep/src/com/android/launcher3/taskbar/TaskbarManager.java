@@ -63,7 +63,7 @@ import com.android.systemui.shared.system.QuickStepContract;
 import com.android.systemui.unfold.UnfoldTransitionProgressProvider;
 import com.android.systemui.unfold.util.ScopedUnfoldTransitionProgressProvider;
 
-import lineageos.providers.LineageSettings;
+//import lineageos.providers.LineageSettings;
 
 import java.io.PrintWriter;
 import java.util.StringJoiner;
@@ -84,8 +84,8 @@ public class TaskbarManager {
     private static final Uri NAV_BAR_KIDS_MODE = Settings.Secure.getUriFor(
             Settings.Secure.NAV_BAR_KIDS_MODE);
 
-    private static final Uri ENABLE_TASKBAR_URI = LineageSettings.System.getUriFor(
-            LineageSettings.System.ENABLE_TASKBAR);
+//    private static final Uri ENABLE_TASKBAR_URI = LineageSettings.System.getUriFor(
+//            LineageSettings.System.ENABLE_TASKBAR);
 
     private final Context mContext;
     private final DisplayController mDisplayController;
@@ -152,8 +152,9 @@ public class TaskbarManager {
         mEnableTaskBarListener = isTaskBarEnabled -> {
             // Create the illusion of this taking effect immediately
             // Also needed because TaskbarManager inits before SystemUiProxy on start
-            boolean enabled = LineageSettings.System.getInt(mContext.getContentResolver(),
-                    LineageSettings.System.ENABLE_TASKBAR, 0) == 1;
+//            boolean enabled = LineageSettings.System.getInt(mContext.getContentResolver(),
+//                    LineageSettings.System.ENABLE_TASKBAR, 0) == 1;
+            boolean enabled = false;
             SystemUiProxy.INSTANCE.get(mContext).setTaskbarEnabled(enabled);
 
             // Restart launcher
@@ -239,8 +240,8 @@ public class TaskbarManager {
                 mUserSetupCompleteListener);
         SettingsCache.INSTANCE.get(mContext).register(NAV_BAR_KIDS_MODE,
                 mNavBarKidsModeListener);
-        SettingsCache.INSTANCE.get(mContext).register(ENABLE_TASKBAR_URI,
-                mEnableTaskBarListener);
+//        SettingsCache.INSTANCE.get(mContext).register(ENABLE_TASKBAR_URI,
+//                mEnableTaskBarListener);
         mContext.registerComponentCallbacks(mComponentCallbacks);
         mShutdownReceiver.register(mContext, Intent.ACTION_SHUTDOWN);
         UI_HELPER_EXECUTOR.execute(() -> {

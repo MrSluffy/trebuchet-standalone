@@ -19,13 +19,13 @@ import android.view.MotionEvent
 import com.android.launcher3.R
 import com.android.launcher3.Utilities
 import com.android.launcher3.anim.Interpolators.LINEAR
-import com.android.launcher3.testing.shared.ResourceUtils
 import com.android.launcher3.touch.SingleAxisSwipeDetector
 import com.android.launcher3.touch.SingleAxisSwipeDetector.DIRECTION_NEGATIVE
 import com.android.launcher3.touch.SingleAxisSwipeDetector.VERTICAL
 import com.android.launcher3.util.DisplayController
 import com.android.launcher3.util.TouchController
 import com.android.quickstep.inputconsumers.TaskbarStashInputConsumer
+import com.android.systemui.shared.testing.ResourceUtils
 
 /**
  * A helper [TouchController] for [TaskbarDragLayerController], specifically to handle touch events

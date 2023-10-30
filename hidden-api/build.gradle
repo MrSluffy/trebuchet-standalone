@@ -1,0 +1,12 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    namespace 'com.android.launcher3.hidden_api'
+}
+
+dependencies {
+    annotationProcessor 'dev.rikka.tools.refine:annotation-processor:4.3.0'
+    compileOnly 'dev.rikka.tools.refine:annotation:4.3.0'
+}

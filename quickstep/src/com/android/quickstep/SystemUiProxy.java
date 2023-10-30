@@ -408,14 +408,10 @@ public class SystemUiProxy implements ISystemUiProxy {
         }
     }
 
-    @Override
+//    @Override
     public void takeScreenshot(ScreenshotRequest request) {
         if (mSystemUiProxy != null) {
-            try {
-                mSystemUiProxy.takeScreenshot(request);
-            } catch (RemoteException e) {
-                Log.w(TAG, "Failed call takeScreenshot");
-            }
+            //                mSystemUiProxy.takeScreenshot(request);
         }
     }
 

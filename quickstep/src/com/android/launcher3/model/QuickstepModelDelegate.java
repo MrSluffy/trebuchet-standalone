@@ -64,9 +64,12 @@ import com.android.launcher3.model.data.WorkspaceItemInfo;
 import com.android.launcher3.shortcuts.ShortcutKey;
 import com.android.launcher3.util.IntSparseArrayMap;
 import com.android.launcher3.util.PersistedItemArray;
+import com.android.launcher3.util.TraceHelper;
 import com.android.quickstep.logging.SettingsChangeLogger;
 import com.android.quickstep.logging.StatsLogCompatManager;
 import com.android.systemui.shared.system.SysUiStatsLog;
+
+import org.lineage.TrebuchetApp;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -157,8 +160,10 @@ public class QuickstepModelDelegate extends ModelDelegate {
 
     @Override
     public void workspaceLoadComplete() {
-        super.workspaceLoadComplete();
-        recreatePredictors();
+        if(TrebuchetApp.isRecentsEnabled ()){
+            super.workspaceLoadComplete();
+            recreatePredictors();
+        }
     }
 
     @Override

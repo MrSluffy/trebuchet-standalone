@@ -69,7 +69,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.UiThread;
 
-import com.android.app.viewcapture.SettingsAwareViewCapture;
+//import com.android.app.viewcapture.SettingsAwareViewCapture;
 import com.android.launcher3.BaseDraggingActivity;
 import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.R;
@@ -125,6 +125,8 @@ import com.android.wm.shell.splitscreen.ISplitScreen;
 import com.android.wm.shell.startingsurface.IStartingWindow;
 import com.android.wm.shell.transition.IShellTransitions;
 
+import org.lineage.TrebuchetApp;
+
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.Arrays;
@@ -145,7 +147,7 @@ public class TouchInteractionService extends Service
 
     private static final String HAS_ENABLED_QUICKSTEP_ONCE = "launcher.has_enabled_quickstep_once";
 
-    private final TISBinder mTISBinder = new TISBinder();
+    private final TISBinder mTISBinder = TrebuchetApp.isRecentsEnabled () ? new TISBinder(): null;
 
     /**
      * Local IOverviewProxy implementation with some methods for local components
@@ -580,6 +582,10 @@ public class TouchInteractionService extends Service
 
     @Override
     public void onDestroy() {
+        if (!TrebuchetApp.isRecentsEnabled()) {
+            super.onDestroy();
+            return;
+        }
         Log.d(TAG, "Touch service destroyed: user=" + getUserId());
         sIsInitialized = false;
         if (mDeviceState.isUserUnlocked()) {
@@ -1217,7 +1223,7 @@ public class TouchInteractionService extends Service
             mTaskbarManager.dumpLogs("", pw);
 
             if (FeatureFlags.CONTINUOUS_VIEW_TREE_CAPTURE.get()) {
-                SettingsAwareViewCapture.getInstance(this).dump(pw, fd, this);
+//                SettingsAwareViewCapture.getInstance(this).dump(pw, fd, this);
             }
         }
     }

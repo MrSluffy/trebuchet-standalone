@@ -31,6 +31,8 @@ import com.android.launcher3.config.FeatureFlags.BooleanFlag;
 import com.android.launcher3.config.FeatureFlags.IntFlag;
 import com.android.launcher3.util.ScreenOnTracker;
 
+import org.lineage.TrebuchetApp;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,8 +62,8 @@ public class FlagsFactory {
         if (!FLAG_AUTO_APPLY_ENABLED) {
             return;
         }
-        DeviceConfig.addOnPropertiesChangedListener(
-                NAMESPACE_LAUNCHER, UI_HELPER_EXECUTOR, this::onPropertiesChanged);
+//        DeviceConfig.addOnPropertiesChangedListener(
+//                NAMESPACE_LAUNCHER, UI_HELPER_EXECUTOR, this::onPropertiesChanged);
     }
 
     /**
@@ -75,7 +77,7 @@ public class FlagsFactory {
             boolean currentValue = prefs.getBoolean(key, defaultValue);
             DebugFlag flag = new DebugFlag(key, description, defaultValue, currentValue);
             sDebugFlags.add(flag);
-            return flag;
+            return new BooleanFlag(defaultValue);
         } else {
             return new BooleanFlag(defaultValue);
         }
@@ -87,17 +89,17 @@ public class FlagsFactory {
     public static BooleanFlag getReleaseFlag(
             int bugId, String key, boolean defaultValueInCode, String description) {
         INSTANCE.mKeySet.add(key);
-        boolean defaultValue = DeviceConfig.getBoolean(NAMESPACE_LAUNCHER, key, defaultValueInCode);
+//        boolean defaultValue = TrebuchetApp.isRecentsEnabled () && DeviceConfig.getBoolean(NAMESPACE_LAUNCHER, key, defaultValueInCode);
         if (Utilities.IS_DEBUG_DEVICE) {
             SharedPreferences prefs = currentApplication()
                     .getSharedPreferences(FLAGS_PREF_NAME, Context.MODE_PRIVATE);
-            boolean currentValue = prefs.getBoolean(key, defaultValue);
-            DebugFlag flag = new DeviceFlag(key, description, defaultValue, currentValue,
-                    defaultValueInCode);
-            sDebugFlags.add(flag);
-            return flag;
+//            boolean currentValue = prefs.getBoolean(key, defaultValueInCode);
+//            DebugFlag flag = new DeviceFlag(key, description, defaultValueInCode, currentValue,
+//                    defaultValueInCode);
+//            sDebugFlags.add(flag);
+            return new BooleanFlag(defaultValueInCode);
         } else {
-            return new BooleanFlag(defaultValue);
+            return new BooleanFlag(defaultValueInCode);
         }
     }
 

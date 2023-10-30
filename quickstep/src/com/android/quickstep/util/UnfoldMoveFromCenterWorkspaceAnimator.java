@@ -65,4 +65,8 @@ public class UnfoldMoveFromCenterWorkspaceAnimator extends BaseUnfoldMoveFromCen
         restoreClippings();
         super.onTransitionFinished();
     }
+
+    @Override
+    public void onTransitionFinishing() {
+    }
 }

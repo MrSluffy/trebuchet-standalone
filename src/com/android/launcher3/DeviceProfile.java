@@ -57,7 +57,7 @@ import com.android.launcher3.util.DisplayController;
 import com.android.launcher3.util.DisplayController.Info;
 import com.android.launcher3.util.WindowBounds;
 
-import lineageos.providers.LineageSettings;
+//import lineageos.providers.LineageSettings;
 
 import java.io.PrintWriter;
 import java.util.Locale;
@@ -299,8 +299,9 @@ public class DeviceProfile {
         isTablet = info.isTablet(windowBounds);
         isPhone = !isTablet;
         isTwoPanels = isTablet && isMultiDisplay;
-        boolean isTaskBarEnabled = LineageSettings.System.getInt(context.getContentResolver(),
-                LineageSettings.System.ENABLE_TASKBAR, isTablet ? 1 : 0) == 1;
+//        boolean isTaskBarEnabled = LineageSettings.System.getInt(context.getContentResolver(),
+//                LineageSettings.System.ENABLE_TASKBAR, isTablet ? 1 : 0) == 1;
+        boolean isTaskBarEnabled = false;
         isTaskbarPresent = isTaskBarEnabled && ApiWrapper.TASKBAR_DRAWN_IN_PROCESS;
 
         // Some more constants.

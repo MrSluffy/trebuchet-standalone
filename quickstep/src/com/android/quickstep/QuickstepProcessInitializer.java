@@ -29,6 +29,8 @@ import com.android.launcher3.BuildConfig;
 import com.android.launcher3.MainProcessInitializer;
 import com.android.systemui.shared.system.InteractionJankMonitorWrapper;
 
+import org.chickenhook.restrictionbypass.Unseal;
+
 @SuppressWarnings("unused")
 @TargetApi(Build.VERSION_CODES.R)
 public class QuickstepProcessInitializer extends MainProcessInitializer {
@@ -40,6 +42,13 @@ public class QuickstepProcessInitializer extends MainProcessInitializer {
         // Fake call to create an instance of InteractionJankMonitor to avoid binder calls during
         // its initialization during transitions.
         InteractionJankMonitorWrapper.cancel(-1);
+        try {
+            Unseal.unseal();
+            Log.i(TAG, "Unseal success!");
+        } catch (Exception e) {
+            Log.e(TAG, "Unseal fail!");
+            e.printStackTrace();
+        }
     }
 
     @Override

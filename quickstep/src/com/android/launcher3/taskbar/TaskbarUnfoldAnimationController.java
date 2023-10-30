@@ -105,5 +105,9 @@ public class TaskbarUnfoldAnimationController implements
         public void onTransitionProgress(float progress) {
             mMoveFromCenterAnimator.onTransitionProgress(progress);
         }
+
+        @Override
+        public void onTransitionFinishing() {
+        }
     }
 }

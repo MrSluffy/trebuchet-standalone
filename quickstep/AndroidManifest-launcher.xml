@@ -27,6 +27,7 @@
     -->
 
     <application
+        android:name="org.lineage.TrebuchetApp"
         android:backupAgent="com.android.launcher3.LauncherBackupAgent"
         android:fullBackupOnly="true"
         android:fullBackupContent="@xml/backupscheme"
@@ -62,6 +63,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.MONKEY"/>
                 <category android:name="android.intent.category.LAUNCHER_APP" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <meta-data
                 android:name="com.android.launcher3.grid.control"
@@ -69,6 +71,13 @@
             <meta-data
                 android:name="com.android.launcher3.themedicon.option"
                 android:value="${packageName}.grid_control" />
+            <meta-data
+                android:name="xyz.paphonb.quickstepswitcher.minSdk"
+                android:value="${quickstepMinSdk}" />
+
+            <meta-data
+                android:name="xyz.paphonb.quickstepswitcher.maxSdk"
+                android:value="${quickstepMaxSdk}" />
         </activity>
 
     </application>

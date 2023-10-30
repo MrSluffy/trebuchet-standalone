@@ -24,7 +24,7 @@ import static com.android.launcher3.logger.LauncherAtom.ContainerInfo.ContainerC
 import static com.android.launcher3.logger.LauncherAtom.ContainerInfo.ContainerCase.EXTENDED_CONTAINERS;
 import static com.android.launcher3.logger.LauncherAtom.ContainerInfo.ContainerCase.FOLDER;
 import static com.android.launcher3.logger.LauncherAtom.ContainerInfo.ContainerCase.SEARCH_RESULT_CONTAINER;
-import static com.android.launcher3.logger.LauncherAtomExtensions.ExtendedContainers.ContainerCase.DEVICE_SEARCH_RESULT_CONTAINER;
+//import static com.android.launcher3.logger.LauncherAtomExtensions.ExtendedContainers.ContainerCase.DEVICE_SEARCH_RESULT_CONTAINER;
 import static com.android.launcher3.logging.StatsLogManager.LauncherEvent.LAUNCHER_WORKSPACE_SNAPSHOT;
 import static com.android.systemui.shared.system.SysUiStatsLog.LAUNCHER_UICHANGED__DST_STATE__ALLAPPS;
 import static com.android.systemui.shared.system.SysUiStatsLog.LAUNCHER_UICHANGED__DST_STATE__BACKGROUND;
@@ -51,9 +51,9 @@ import com.android.launcher3.logger.LauncherAtom.FolderIcon;
 import com.android.launcher3.logger.LauncherAtom.FromState;
 import com.android.launcher3.logger.LauncherAtom.LauncherAttributes;
 import com.android.launcher3.logger.LauncherAtom.ToState;
-import com.android.launcher3.logger.LauncherAtomExtensions.DeviceSearchResultContainer;
-import com.android.launcher3.logger.LauncherAtomExtensions.DeviceSearchResultContainer.SearchAttributes;
-import com.android.launcher3.logger.LauncherAtomExtensions.ExtendedContainers;
+//import com.android.launcher3.logger.LauncherAtomExtensions.DeviceSearchResultContainer;
+//import com.android.launcher3.logger.LauncherAtomExtensions.DeviceSearchResultContainer.SearchAttributes;
+//import com.android.launcher3.logger.LauncherAtomExtensions.ExtendedContainers;
 import com.android.launcher3.logging.InstanceId;
 import com.android.launcher3.logging.StatsLogManager;
 import com.android.launcher3.model.AllAppsList;
@@ -178,7 +178,7 @@ public class StatsLogCompatManager extends StatsLogManager {
      * implementation.
      */
     public static StatsEvent buildStatsEvent(LauncherAtom.ItemInfo info,
-            @Nullable InstanceId instanceId) {
+                                             @Nullable InstanceId instanceId) {
         return SysUiStatsLog.buildStatsEvent(
                 SysUiStatsLog.LAUNCHER_LAYOUT_SNAPSHOT, // atom ID,
                 LAUNCHER_WORKSPACE_SNAPSHOT.getId(), // event_id = 1;
@@ -358,8 +358,8 @@ public class StatsLogCompatManager extends StatsLogManager {
                         new BaseModelUpdateTask() {
                             @Override
                             public void execute(@NonNull final LauncherAppState app,
-                                    @NonNull final BgDataModel dataModel,
-                                    @NonNull final AllAppsList apps) {
+                                                @NonNull final BgDataModel dataModel,
+                                                @NonNull final AllAppsList apps) {
                                 FolderInfo folderInfo = dataModel.folders.get(mItemInfo.container);
                                 write(event, applyOverwrites(mItemInfo.buildProto(folderInfo)));
                             }
@@ -646,14 +646,14 @@ public class StatsLogCompatManager extends StatsLogManager {
                 return info.getContainerInfo().getTaskBarContainer().getCardinality();
             case SEARCH_RESULT_CONTAINER:
                 return info.getContainerInfo().getSearchResultContainer().getQueryLength();
-            case EXTENDED_CONTAINERS:
-                ExtendedContainers extendedCont = info.getContainerInfo().getExtendedContainers();
-                if (extendedCont.getContainerCase() == DEVICE_SEARCH_RESULT_CONTAINER) {
-                    DeviceSearchResultContainer deviceSearchResultCont = extendedCont
-                            .getDeviceSearchResultContainer();
-                    return deviceSearchResultCont.hasQueryLength() ? deviceSearchResultCont
-                            .getQueryLength() : -1;
-                }
+//            case EXTENDED_CONTAINERS:
+//                ExtendedContainers extendedCont = info.getContainerInfo().getExtendedContainers();
+//                if (extendedCont.getContainerCase() == DEVICE_SEARCH_RESULT_CONTAINER) {
+//                    DeviceSearchResultContainer deviceSearchResultCont = extendedCont
+//                            .getDeviceSearchResultContainer();
+//                    return deviceSearchResultCont.hasQueryLength() ? deviceSearchResultCont
+//                            .getQueryLength() : -1;
+//                }
             default:
                 return info.getFolderIcon().getCardinality();
         }
@@ -703,9 +703,9 @@ public class StatsLogCompatManager extends StatsLogManager {
             } else {
                 return containerInfo.getFolder().getGridX();
             }
-        } else if (containerInfo.getContainerCase() == EXTENDED_CONTAINERS) {
-            return containerInfo.getExtendedContainers()
-                    .getDeviceSearchResultContainer().getGridX();
+//        } else if (containerInfo.getContainerCase() == EXTENDED_CONTAINERS) {
+//            return containerInfo.getExtendedContainers()
+//                    .getDeviceSearchResultContainer().getGridX();
         } else {
             return containerInfo.getWorkspace().getGridX();
         }
@@ -767,9 +767,9 @@ public class StatsLogCompatManager extends StatsLogManager {
         } else if (info.getContainerInfo().getContainerCase() == SEARCH_RESULT_CONTAINER) {
             return info.getContainerInfo().getSearchResultContainer().getParentContainerCase()
                     .getNumber() + SEARCH_RESULT_HIERARCHY_OFFSET;
-        } else if (info.getContainerInfo().getContainerCase() == EXTENDED_CONTAINERS) {
-            return info.getContainerInfo().getExtendedContainers().getContainerCase().getNumber()
-                    + EXTENDED_CONTAINERS_HIERARCHY_OFFSET;
+//        } else if (info.getContainerInfo().getContainerCase() == EXTENDED_CONTAINERS) {
+//            return info.getContainerInfo().getExtendedContainers().getContainerCase().getNumber()
+//                    + EXTENDED_CONTAINERS_HIERARCHY_OFFSET;
         } else if (info.getContainerInfo().getContainerCase() == ALL_APPS_CONTAINER) {
             return info.getContainerInfo().getAllAppsContainer().getParentContainerCase()
                     .getNumber() + ALL_APPS_HIERARCHY_OFFSET;
@@ -804,35 +804,35 @@ public class StatsLogCompatManager extends StatsLogManager {
         if (Utilities.isRunningInTestHarness()) {
             return 0;
         }
-        ContainerInfo containerInfo = info.getContainerInfo();
-        if (containerInfo.getContainerCase() == EXTENDED_CONTAINERS
-                && containerInfo.getExtendedContainers().getContainerCase()
-                == DEVICE_SEARCH_RESULT_CONTAINER
-                && containerInfo.getExtendedContainers()
-                .getDeviceSearchResultContainer().hasSearchAttributes()
-        ) {
-            return searchAttributesToInt(containerInfo.getExtendedContainers()
-                    .getDeviceSearchResultContainer().getSearchAttributes());
-        }
+//        ContainerInfo containerInfo = info.getContainerInfo();
+//        if (containerInfo.getContainerCase() == EXTENDED_CONTAINERS
+//                && containerInfo.getExtendedContainers().getContainerCase()
+//                == DEVICE_SEARCH_RESULT_CONTAINER
+//                && containerInfo.getExtendedContainers()
+//                .getDeviceSearchResultContainer().hasSearchAttributes()
+//        ) {
+//            return searchAttributesToInt(containerInfo.getExtendedContainers()
+//                    .getDeviceSearchResultContainer().getSearchAttributes());
+//        }
         return 0;
     }
 
-    private static int searchAttributesToInt(SearchAttributes searchAttributes) {
-        int response = 0;
-        if (searchAttributes.getCorrectedQuery()) {
-            response = response | SEARCH_ATTRIBUTES_CORRECTED_QUERY;
-        }
-        if (searchAttributes.getDirectMatch()) {
-            response = response | SEARCH_ATTRIBUTES_DIRECT_MATCH;
-        }
-        if (searchAttributes.getEntryState() == SearchAttributes.EntryState.ALL_APPS) {
-            response = response | SEARCH_ATTRIBUTES_ENTRY_STATE_ALL_APPS;
-        } else if (searchAttributes.getEntryState() == SearchAttributes.EntryState.QSB) {
-            response = response | SEARCH_ATTRIBUTES_ENTRY_STATE_QSB;
-        }
-
-        return response;
-    }
+//    private static int searchAttributesToInt(SearchAttributes searchAttributes) {
+//        int response = 0;
+//        if (searchAttributes.getCorrectedQuery()) {
+//            response = response | SEARCH_ATTRIBUTES_CORRECTED_QUERY;
+//        }
+//        if (searchAttributes.getDirectMatch()) {
+//            response = response | SEARCH_ATTRIBUTES_DIRECT_MATCH;
+//        }
+//        if (searchAttributes.getEntryState() == SearchAttributes.EntryState.ALL_APPS) {
+//            response = response | SEARCH_ATTRIBUTES_ENTRY_STATE_ALL_APPS;
+//        } else if (searchAttributes.getEntryState() == SearchAttributes.EntryState.QSB) {
+//            response = response | SEARCH_ATTRIBUTES_ENTRY_STATE_QSB;
+//        }
+//
+//        return response;
+//    }
 
     /**
      * Interface to get stats log while it is dispatched to the system

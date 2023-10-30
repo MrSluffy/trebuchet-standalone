@@ -35,7 +35,7 @@
         android:debuggable="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/derived_app_name"
-        android:theme="@style/AppTheme"
+        android:theme="@style/TrebuchetAppTheme"
         android:largeHeap="@bool/config_largeHeap"
         android:restoreAnyVersion="true"
         android:supportsRtl="true"

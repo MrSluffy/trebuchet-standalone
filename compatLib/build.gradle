@@ -1,0 +1,8 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    namespace "com.android.launcher3"
+    addFrameworkJar('framework-12.jar')
+}

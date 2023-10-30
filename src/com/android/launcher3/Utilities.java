@@ -136,8 +136,7 @@ public final class Utilities {
      * @deprecated Use {@link BuildConfig#IS_DEBUG_DEVICE} directly
      */
     @Deprecated
-    public static final boolean IS_DEBUG_DEVICE =
-            Build.TYPE.toLowerCase(Locale.ROOT).equals("eng");
+    public static final boolean IS_DEBUG_DEVICE = true;
 
     public static final int TRANSLATE_UP = 0;
     public static final int TRANSLATE_DOWN = 1;
@@ -652,7 +651,7 @@ public final class Utilities {
         } else {
             return Process.myUserHandle().equals(info.user)
                     ? new ColorDrawable(Color.TRANSPARENT)
-                    : context.getDrawable(R.drawable.ic_work_app_badge);
+                    : context.getDrawable(com.android.launcher3.icons.R.drawable.ic_work_app_badge);
         }
     }
 

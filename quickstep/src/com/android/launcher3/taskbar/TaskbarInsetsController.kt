@@ -68,7 +68,7 @@ class TaskbarInsetsController(val context: TaskbarActivityContext) : LoggableTas
         onTaskbarWindowHeightOrInsetsChanged()
 
         context.addOnDeviceProfileChangeListener(deviceProfileChangeListener)
-        gestureNavSettingsObserver.registerForCallingUser()
+//        gestureNavSettingsObserver.registerForCallingUser()
     }
 
     fun onDestroy() {
@@ -122,32 +122,32 @@ class TaskbarInsetsController(val context: TaskbarActivityContext) : LoggableTas
         val tappableHeight = controllers.taskbarStashController.tappableHeightToReportToApps
         val res = context.resources
 
-        for (provider in windowLayoutParams.providedInsets) {
-            if (
-                provider.type == ITYPE_EXTRA_NAVIGATION_BAR ||
-                    provider.type == ITYPE_BOTTOM_MANDATORY_GESTURES
-            ) {
-                provider.insetsSize = getInsetsByNavMode(contentHeight)
-            } else if (provider.type == ITYPE_BOTTOM_TAPPABLE_ELEMENT) {
-                provider.insetsSize = getInsetsByNavMode(tappableHeight)
-            } else if (provider.type == ITYPE_LEFT_GESTURES) {
-                provider.insetsSize =
-                    Insets.of(
-                        gestureNavSettingsObserver.getLeftSensitivityForCallingUser(res),
-                        0,
-                        0,
-                        0
-                    )
-            } else if (provider.type == ITYPE_RIGHT_GESTURES) {
-                provider.insetsSize =
-                    Insets.of(
-                        0,
-                        0,
-                        gestureNavSettingsObserver.getRightSensitivityForCallingUser(res),
-                        0
-                    )
-            }
-        }
+//        for (provider in windowLayoutParams.providedInsets) {
+//            if (
+//                provider.type == ITYPE_EXTRA_NAVIGATION_BAR ||
+//                    provider.type == ITYPE_BOTTOM_MANDATORY_GESTURES
+//            ) {
+//                provider.insetsSize = getInsetsByNavMode(contentHeight)
+//            } else if (provider.type == ITYPE_BOTTOM_TAPPABLE_ELEMENT) {
+//                provider.insetsSize = getInsetsByNavMode(tappableHeight)
+//            } else if (provider.type == ITYPE_LEFT_GESTURES) {
+//                provider.insetsSize =
+//                    Insets.of(
+//                        gestureNavSettingsObserver.getLeftSensitivityForCallingUser(res),
+//                        0,
+//                        0,
+//                        0
+//                    )
+//            } else if (provider.type == ITYPE_RIGHT_GESTURES) {
+//                provider.insetsSize =
+//                    Insets.of(
+//                        0,
+//                        0,
+//                        gestureNavSettingsObserver.getRightSensitivityForCallingUser(res),
+//                        0
+//                    )
+//            }
+//        }
 
         val imeInsetsSize = getInsetsByNavMode(taskbarHeightForIme)
         val insetsSizeOverride =
@@ -164,15 +164,15 @@ class TaskbarInsetsController(val context: TaskbarActivityContext) : LoggableTas
                     visInsetsSizeForGestureNavTappableElement
                 ),
             )
-        for (provider in windowLayoutParams.providedInsets) {
-            if (context.isGestureNav && provider.type == ITYPE_BOTTOM_TAPPABLE_ELEMENT) {
-                provider.insetsSizeOverrides = insetsSizeOverrideForGestureNavTappableElement
-            } else if (provider.type != ITYPE_LEFT_GESTURES
-                    && provider.type != ITYPE_RIGHT_GESTURES) {
-                // We only override insets at the bottom of the screen
-                provider.insetsSizeOverrides = insetsSizeOverride
-            }
-        }
+//        for (provider in windowLayoutParams.providedInsets) {
+//            if (context.isGestureNav && provider.type == ITYPE_BOTTOM_TAPPABLE_ELEMENT) {
+//                provider.insetsSizeOverrides = insetsSizeOverrideForGestureNavTappableElement
+//            } else if (provider.type != ITYPE_LEFT_GESTURES
+//                    && provider.type != ITYPE_RIGHT_GESTURES) {
+//                // We only override insets at the bottom of the screen
+//                provider.insetsSizeOverrides = insetsSizeOverride
+//            }
+//        }
         context.notifyUpdateLayoutParams()
     }
 
@@ -205,11 +205,11 @@ class TaskbarInsetsController(val context: TaskbarActivityContext) : LoggableTas
         providesInsetsTypes: IntArray,
         providesInsetsSources: IntArray
     ) {
-        params.providedInsets = arrayOfNulls<InsetsFrameProvider>(providesInsetsTypes.size)
-        for (i in providesInsetsTypes.indices) {
-            params.providedInsets[i] =
-                InsetsFrameProvider(providesInsetsTypes[i], providesInsetsSources[i], null, null)
-        }
+//        params.providedInsets = arrayOfNulls<InsetsFrameProvider>(providesInsetsTypes.size)
+//        for (i in providesInsetsTypes.indices) {
+//            params.providedInsets[i] =
+//                InsetsFrameProvider(providesInsetsTypes[i], providesInsetsSources[i], null, null)
+//        }
     }
 
     /**
@@ -267,24 +267,24 @@ class TaskbarInsetsController(val context: TaskbarActivityContext) : LoggableTas
     }
 
     override fun dumpLogs(prefix: String, pw: PrintWriter) {
-        pw.println(prefix + "TaskbarInsetsController:")
-        pw.println("$prefix\twindowHeight=${windowLayoutParams.height}")
-        for (provider in windowLayoutParams.providedInsets) {
-            pw.print(
-                "$prefix\tprovidedInsets: (type=" +
-                    InsetsState.typeToString(provider.type) +
-                    " insetsSize=" +
-                    provider.insetsSize
-            )
-            if (provider.insetsSizeOverrides != null) {
-                pw.print(" insetsSizeOverrides={")
-                for ((i, overrideSize) in provider.insetsSizeOverrides.withIndex()) {
-                    if (i > 0) pw.print(", ")
-                    pw.print(overrideSize)
-                }
-                pw.print("})")
-            }
-            pw.println()
-        }
+//        pw.println(prefix + "TaskbarInsetsController:")
+//        pw.println("$prefix\twindowHeight=${windowLayoutParams.height}")
+//        for (provider in windowLayoutParams.providedInsets) {
+//            pw.print(
+//                "$prefix\tprovidedInsets: (type=" +
+//                    InsetsState.typeToString(provider.type) +
+//                    " insetsSize=" +
+//                    provider.insetsSize
+//            )
+//            if (provider.insetsSizeOverrides != null) {
+//                pw.print(" insetsSizeOverrides={")
+//                for ((i, overrideSize) in provider.insetsSizeOverrides.withIndex()) {
+//                    if (i > 0) pw.print(", ")
+//                    pw.print(overrideSize)
+//                }
+//                pw.print("})")
+//            }
+//            pw.println()
+//        }
     }
 }

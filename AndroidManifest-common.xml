@@ -168,7 +168,7 @@
         -->
         <activity
             android:name="com.android.launcher3.secondarydisplay.SecondaryDisplayLauncher"
-            android:theme="@style/AppTheme"
+            android:theme="@style/TrebuchetAppTheme"
             android:launchMode="singleTop"
             android:exported="true"
             android:enabled="true">

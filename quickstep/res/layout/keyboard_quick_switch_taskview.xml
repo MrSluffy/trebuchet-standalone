@@ -23,7 +23,7 @@
     android:importantForAccessibility="yes"
     android:background="@drawable/keyboard_quick_switch_task_view_background"
     android:clipToOutline="true"
-    launcher:borderColor="?androidprv:attr/colorAccentSecondaryVariant">
+    launcher:borderColor="@color/design_default_color_secondary_variant">
 
         <include
             layout="@layout/keyboard_quick_switch_thumbnail"

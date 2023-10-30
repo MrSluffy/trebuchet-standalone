@@ -1,47 +1,158 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        google()
-    }
-    dependencies {
-        classpath GRADLE_CLASS_PATH
-        classpath PROTOBUF_CLASS_PATH
-    }
+import com.android.build.gradle.api.AndroidBasePlugin
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    id 'com.android.application' version "8.1.1"
+    id 'com.android.library' version "8.1.1" apply false
+    id 'org.jetbrains.kotlin.android' version "1.9.10"
+    id 'org.jetbrains.kotlin.plugin.parcelize' version "1.9.10"
+    id 'org.jetbrains.kotlin.plugin.serialization' version "1.9.10"
+    id "com.google.devtools.ksp" version "1.9.10-1.0.13"
+    id 'com.google.protobuf' version "0.9.4"
+    id 'app.cash.licensee' version "1.7.0"
+    id 'dev.rikka.tools.refine' version "4.3.0"
+    id 'org.gradle.android.cache-fix' version '2.8.0'
 }
 
-final String ANDROID_TOP = "${rootDir}/../../.."
-final String FRAMEWORK_PREBUILTS_DIR = "${ANDROID_TOP}/prebuilts/framework_intermediates/"
+allprojects {
+    plugins.withType(AndroidBasePlugin).configureEach {
+        apply plugin: 'org.gradle.android.cache-fix'
 
-apply plugin: 'com.android.application'
-apply plugin: 'com.google.protobuf'
-
-android {
-    compileSdkVersion COMPILE_SDK
-    buildToolsVersion BUILD_TOOLS_VERSION
-
-    defaultConfig {
-        minSdkVersion 26
-        targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables.useSupportLibrary = true
-    }
-    buildTypes {
-        debug {
-            minifyEnabled false
+        project.android {
+            compileSdk 34
+            defaultConfig {
+                minSdk 26
+                targetSdk 33
+                vectorDrawables.useSupportLibrary = true
+            }
+            lint {
+                abortOnError true
+                checkReleaseBuilds false
+            }
+        }
+        project.dependencies {
+            implementation 'androidx.core:core-ktx:1.12.0'
+            implementation 'androidx.appcompat:appcompat:1.6.1'
         }
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+    plugins.withType(JavaBasePlugin).configureEach {
+        java {
+            toolchain.languageVersion = JavaLanguageVersion.of(17)
+        }
     }
 
-    // The flavor dimensions for build variants (e.g. aospWithQuickstep, aospWithoutQuickstep)
-    // See: https://developer.android.com/studio/build/build-variants#flavor-dimensions
-    flavorDimensions "app", "recents"
+    ext.addFrameworkJar = { String name ->
+        def frameworkJar = new File(FRAMEWORK_PREBUILTS_DIR, name)
+        if (!frameworkJar.exists()) {
+            throw new IllegalArgumentException("Framework jar path ${frameworkJar.path} doesn't exist")
+        }
+        gradle.projectsEvaluated {
+            tasks.withType(JavaCompile).configureEach {
+                classpath = files(frameworkJar, classpath)
+            }
+            tasks.withType(KotlinCompile).configureEach {
+                libraries.from(files(frameworkJar))
+            }
+        }
+    }
+}
+
+// todo remove ext block after migrating to version catalog
+ext {
+    FRAMEWORK_PREBUILTS_DIR = "$rootDir/prebuilts/libs"
+    accompanist_version = '0.32.0'
+    libsu_version = '5.2.0'
+    protocVersion = '3.24.2'
+    room_version = '2.5.2'
+    optoVersion = "1.0.18"
+}
+
+final def buildCommit = providers.exec {
+    commandLine 'git', 'rev-parse', '--short=7', 'HEAD'
+}.standardOutput.asText.get().trim()
+
+final def ciBuild = System.getenv("CI") == "true"
+final def ciRef = System.getenv("GITHUB_REF") ?: ""
+final def ciRunNumber = System.getenv("GITHUB_RUN_NUMBER") ?: ""
+final def isReleaseBuild = ciBuild && ciRef.contains("alpha")
+final def devReleaseName = ciBuild ? "Dev (#${ciRunNumber})" : "Dev (${buildCommit})"
+final def versionDisplayName = "${version} ${isReleaseBuild ? releaseName : devReleaseName}"
+final def majorVersion = versionDisplayName.split("\\.")[0]
+
+final def version = "13"
+final def releaseName = "Alpha 1 UnOfficial"
+
+final def quickstepMinSdk = "32"
+final def quickstepMaxSdk = "33"
+
+android {
+    namespace "com.android.launcher3"
+    defaultConfig {
+        versionCode 13
+        versionName "${version} ${releaseName}"
+        buildConfigField "String", "VERSION_DISPLAY_NAME", "\"${versionDisplayName}\""
+        buildConfigField "String", "MAJOR_VERSION", "\"${majorVersion}\""
+        buildConfigField "String", "COMMIT_HASH", "\"${buildCommit}\""
+        buildConfigField "boolean", "ENABLE_AUTO_INSTALLS_LAYOUT", "false"
+
+        manifestPlaceholders.quickstepMinSdk = quickstepMinSdk
+        manifestPlaceholders.quickstepMaxSdk = quickstepMaxSdk
+        buildConfigField "int", "QUICKSTEP_MIN_SDK", quickstepMinSdk
+        buildConfigField "int", "QUICKSTEP_MAX_SDK", quickstepMaxSdk
+    }
+
+    applicationVariants.configureEach { variant ->
+        def copyArtifactList = tasks.register("copy${variant.name.capitalize()}ArtifactList", Copy) {
+            into layout.buildDirectory.dir("generated/dependencyAssets/")
+        }
+        tasks.named("merge${variant.name.capitalize()}Assets").configure {
+            dependsOn copyArtifactList
+        }
+
+        variant.outputs.configureEach {
+            outputFileName = "Trebuchet ${variant.versionName}.apk"
+        }
+    }
+    buildFeatures {
+        aidl true
+        buildConfig true
+        compose true
+        resValues true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.3"
+    }
+
+    packagingOptions.resources.excludes += [
+            "**/*.proto",
+            "**/*.bin",
+            "**/*.java",
+            "**/*.properties",
+            "**/*.version",
+            "**/*.*_module",
+            "com/**",
+            "google/**",
+            "kotlin/**",
+            "kotlinx/**",
+            "okhttp3/**",
+            "META-INF/services/**",
+            "META-INF/com/**",
+            "META-INF/licenses/**",
+            "META-INF/AL2.0",
+            "META-INF/LGPL2.1",
+    ]
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            resValue("string", "derived_app_name", "Trebuchet (Debug)")
+        }
+    }
+
+    flavorDimensions += ["app", "recents"]
 
     productFlavors {
         aosp {
@@ -58,7 +169,6 @@ android {
 
         withQuickstep {
             dimension "recents"
-
             minSdkVersion 28
         }
 
@@ -67,7 +177,6 @@ android {
         }
     }
 
-    // Disable release builds for now
     android.variantFilter { variant ->
         if (variant.buildType.name.endsWith('release')) {
             variant.setIgnore(true)
@@ -77,10 +186,11 @@ android {
     sourceSets {
         main {
             res.srcDirs = ['res']
-            java.srcDirs = ['src', 'src_plugins']
+            res.srcDirs = ['addon', 'res']
+            java.srcDirs = ['src', 'src_plugins', 'tests/shared', 'addon']
             manifest.srcFile 'AndroidManifest-common.xml'
             proto {
-                srcDirs = ['protos/', 'protos_overrides/']
+                srcDirs = ['protos/', 'quickstep/protos_overrides/']
             }
         }
 
@@ -130,33 +240,47 @@ android {
             manifest.srcFile "quickstep/AndroidManifest.xml"
         }
     }
-}
-
-allprojects {
-    repositories {
-        maven { url "../../../prebuilts/sdk/current/androidx/m2repository" }
-        maven { url "../../../prebuilts/fullsdk-darwin/extras/android/m2repository" }
-        maven { url "../../../prebuilts/fullsdk-linux/extras/android/m2repository" }
-        mavenCentral()
-        google()
-    }
+    addFrameworkJar('framework-13.jar')
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['libGoogleFeed.jar'])
+    implementation "androidx.dynamicanimation:dynamicanimation:1.0.0"
+    implementation "androidx.recyclerview:recyclerview:1.3.1"
+    implementation "androidx.preference:preference-ktx:1.2.1"
+    implementation 'androidx.slice:slice-core:1.1.0-alpha02'
+    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.2.0'
+    implementation "androidx.annotation:annotation:1.7.0"
+    implementation "com.google.protobuf:protobuf-javalite:$protocVersion"
+    implementation 'com.google.android.material:material:1.9.0'
 
-    implementation "androidx.dynamicanimation:dynamicanimation:${ANDROID_X_VERSION}"
-    implementation "androidx.recyclerview:recyclerview:${ANDROID_X_VERSION}"
-    implementation "androidx.preference:preference:${ANDROID_X_VERSION}"
-    implementation project(':IconLoader')
-    implementation project(':UiTestsLibLauncher')
-    withQuickstepImplementation project(':SharedLibWrapper')
+    implementation fileTree(dir: FRAMEWORK_PREBUILTS_DIR, include: 'libGoogleFeed.jar')
+    implementation projects.iconloaderlib
+    implementation projects.searchuilib
 
-    // Recents lib dependency
-    withQuickstepImplementation fileTree(dir: "${FRAMEWORK_PREBUILTS_DIR}/quickstep/libs", include: 'sysui_shared.jar')
+
+    withQuickstepImplementation projects.systemUIShared
+    withQuickstepImplementation projects.systemUIAnim
+    withQuickstepImplementation projects.systemUIUnFold
+    withQuickstepCompileOnly projects.hiddenApi
+
+    implementation fileTree(dir: FRAMEWORK_PREBUILTS_DIR, include: 'SystemUI-statsd.jar')
+    implementation fileTree(dir: FRAMEWORK_PREBUILTS_DIR, include: 'WindowManager-Shell.jar')
+    withQuickstepCompileOnly fileTree(dir: FRAMEWORK_PREBUILTS_DIR, include: 'seeder.jar')
+    withQuickstepCompileOnly fileTree(dir: FRAMEWORK_PREBUILTS_DIR, include: 'core.jar')
+    withQuickstepCompileOnly fileTree(dir: FRAMEWORK_PREBUILTS_DIR, include: 'core-all.jar')
+    withQuickstepCompileOnly fileTree(dir: FRAMEWORK_PREBUILTS_DIR, include: 'SystemUI-core.jar')
+    withQuickstepCompileOnly fileTree(dir: FRAMEWORK_PREBUILTS_DIR, include: 'framework-statsd.jar')
 
     // Required for AOSP to compile. This is already included in the sysui_shared.jar
-    withoutQuickstepImplementation fileTree(dir: "${FRAMEWORK_PREBUILTS_DIR}/libs", include: 'plugin_core.jar')
+    withoutQuickstepImplementation fileTree(dir: FRAMEWORK_PREBUILTS_DIR, include: 'plugin_core.jar')
+
+    implementation "com.google.accompanist:accompanist-drawablepainter:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-insets-ui:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-permissions:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
+
+
+    implementation 'com.github.ChickenHook:RestrictionBypass:2.2'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation "org.mockito:mockito-core:1.9.5"
@@ -165,18 +289,22 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.0'
     androidTestImplementation 'com.android.support.test:rules:1.0.0'
     androidTestImplementation 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
-    androidTestImplementation "androidx.annotation:annotation:${ANDROID_X_VERSION}"
+    androidTestImplementation "androidx.annotation:annotation:1.7.0"
 
     api 'com.airbnb.android:lottie:3.3.0'
 }
 
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+    arg("room.incremental", "true")
+}
+
 protobuf {
-    // Configure the protoc executable
     protoc {
-        artifact = "com.google.protobuf:protoc:${protocVersion}${PROTO_ARCH_SUFFIX}"
+        artifact = "com.google.protobuf:protoc:${protocVersion}"
     }
     generateProtoTasks {
-        all().each { task ->
+        all().configureEach { task ->
             task.builtins {
                 remove java
                 java {

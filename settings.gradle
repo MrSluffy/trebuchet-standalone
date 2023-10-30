@@ -1,5 +1,45 @@
-include ':IconLoader'
-project(':IconLoader').projectDir = new File(rootDir, 'iconloaderlib')
+pluginManagement {
+    repositories {
+        google()
+        gradlePluginPortal()
+    }
+}
 
-include ':SharedLibWrapper'
-project(':SharedLibWrapper').projectDir = new File(rootDir, 'SharedLibWrapper')
+// https://docs.gradle.com/enterprise/gradle-plugin/
+plugins {
+    id "com.gradle.enterprise" version "3.14.1"
+}
+
+gradleEnterprise {
+    buildScan {
+        termsOfServiceUrl = "https://gradle.com/terms-of-service"
+        termsOfServiceAgree = "yes"
+        publishAlways()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
+
+enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+include ':iconloaderlib'
+project(':iconloaderlib').projectDir = new File(rootDir, 'platform_frameworks_libs_systemui/iconloaderlib')
+
+include ':searchuilib'
+project(':searchuilib').projectDir = new File(rootDir, 'platform_frameworks_libs_systemui/searchuilib')
+
+include ':systemUIShared'
+include ':systemUIAnim'
+include ':systemUIUnFold'
+include ':compatLib'
+include ':compatLibVR'
+include ':compatLibVS'
+include ':hidden-api'
