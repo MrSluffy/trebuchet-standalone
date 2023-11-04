@@ -185,6 +185,7 @@ import com.android.systemui.unfold.progress.RemoteUnfoldTransitionReceiver;
 import com.android.systemui.unfold.system.ActivityManagerActivityTypeProvider;
 import com.android.systemui.unfold.system.DeviceStateManagerFoldProvider;
 import com.android.systemui.unfold.updates.RotationChangeProvider;
+import com.kieronquinn.app.smartspacer.sdk.client.SmartspacerClient;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -475,6 +476,7 @@ public class QuickstepLauncher extends Launcher {
 
     @Override
     public void onDestroy() {
+        SmartspacerClient.Companion.close();
         mAppTransitionManager.onActivityDestroyed();
         if (mUnfoldTransitionProgressProvider != null) {
             mUnfoldTransitionProgressProvider.destroy();

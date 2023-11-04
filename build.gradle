@@ -169,7 +169,7 @@ android {
 
         withQuickstep {
             dimension "recents"
-            minSdkVersion 28
+            minSdkVersion 29
         }
 
         withoutQuickstep {
@@ -252,6 +252,7 @@ dependencies {
     implementation "androidx.annotation:annotation:1.7.0"
     implementation "com.google.protobuf:protobuf-javalite:$protocVersion"
     implementation 'com.google.android.material:material:1.9.0'
+    implementation 'com.kieronquinn.smartspacer:sdk-client:1.0.1'
 
     implementation fileTree(dir: FRAMEWORK_PREBUILTS_DIR, include: 'libGoogleFeed.jar')
     implementation projects.iconloaderlib
